@@ -1,0 +1,24 @@
+[0.365s] Invoking command in '/home/thxssio/drone/taura-air-system/src/base_controller': PS1=\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[93m\]$(parse_git_branch)\[\033[00m\]$ PYTHONPATH=/home/thxssio/drone/taura-air-system/build/base_controller/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/thxssio/drone/taura-air-system/install/base_controller/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py egg_info --egg-base ../../build/base_controller build --build-base /home/thxssio/drone/taura-air-system/build/base_controller/build install --record /home/thxssio/drone/taura-air-system/build/base_controller/install.log --single-version-externally-managed install_data
+[0.508s] running egg_info
+[0.508s] writing ../../build/base_controller/base_controller.egg-info/PKG-INFO
+[0.508s] writing dependency_links to ../../build/base_controller/base_controller.egg-info/dependency_links.txt
+[0.508s] writing entry points to ../../build/base_controller/base_controller.egg-info/entry_points.txt
+[0.508s] writing requirements to ../../build/base_controller/base_controller.egg-info/requires.txt
+[0.508s] writing top-level names to ../../build/base_controller/base_controller.egg-info/top_level.txt
+[0.510s] reading manifest file '../../build/base_controller/base_controller.egg-info/SOURCES.txt'
+[0.510s] writing manifest file '../../build/base_controller/base_controller.egg-info/SOURCES.txt'
+[0.510s] running build
+[0.510s] running build_py
+[0.510s] copying base_controller/controller.py -> /home/thxssio/drone/taura-air-system/build/base_controller/build/lib/base_controller
+[0.510s] running install
+[0.511s] running install_lib
+[0.511s] copying /home/thxssio/drone/taura-air-system/build/base_controller/build/lib/base_controller/controller.py -> /home/thxssio/drone/taura-air-system/install/base_controller/lib/python3.10/site-packages/base_controller
+[0.512s] byte-compiling /home/thxssio/drone/taura-air-system/install/base_controller/lib/python3.10/site-packages/base_controller/controller.py to controller.cpython-310.pyc
+[0.514s] running install_data
+[0.516s] running install_egg_info
+[0.517s] removing '/home/thxssio/drone/taura-air-system/install/base_controller/lib/python3.10/site-packages/base_controller-1.0.0-py3.10.egg-info' (and everything under it)
+[0.517s] Copying ../../build/base_controller/base_controller.egg-info to /home/thxssio/drone/taura-air-system/install/base_controller/lib/python3.10/site-packages/base_controller-1.0.0-py3.10.egg-info
+[0.519s] running install_scripts
+[0.545s] Installing controller script to /home/thxssio/drone/taura-air-system/install/base_controller/lib/base_controller
+[0.545s] writing list of installed files to '/home/thxssio/drone/taura-air-system/build/base_controller/install.log'
+[0.571s] Invoked command in '/home/thxssio/drone/taura-air-system/src/base_controller' returned '0': PS1=\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[93m\]$(parse_git_branch)\[\033[00m\]$ PYTHONPATH=/home/thxssio/drone/taura-air-system/build/base_controller/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/thxssio/drone/taura-air-system/install/base_controller/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py egg_info --egg-base ../../build/base_controller build --build-base /home/thxssio/drone/taura-air-system/build/base_controller/build install --record /home/thxssio/drone/taura-air-system/build/base_controller/install.log --single-version-externally-managed install_data
