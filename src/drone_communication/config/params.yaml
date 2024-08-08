@@ -1,0 +1,11 @@
+mavros:
+  fcu_url: "udp://:14540@localhost:14557"
+  gcs_url: "udp://@"
+  tgt_system: 1
+  tgt_component: 1
+
+serial_connection:
+  fcu_url: "serial:///dev/ttyUSB0:57600"
+  gcs_url: ""
+  tgt_system: 1
+  tgt_component: 1
