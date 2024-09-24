@@ -6,6 +6,7 @@
 #include "mavros_msgs/srv/command_tol.hpp"
 #include "interface_package/action/takeoff.hpp"
 #include "interface_package/action/land.hpp"
+#include "interface_package/srv/move_command.hpp"  // Adicionando o MoveCommand
 #include "rclcpp_action/rclcpp_action.hpp"
 
 class InterfaceNode : public rclcpp::Node {
@@ -25,8 +26,6 @@ public:
     current_position_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>(
         "/mavros/local_position/pose", rclcpp::SystemDefaultsQoS(), 
         [this](const geometry_msgs::msg::PoseStamped::SharedPtr msg) {
-            // RCLCPP_INFO(this->get_logger(), "Updated position: [x: %.2f, y: %.2f, z: %.2f]", 
-            //             msg->pose.position.x, msg->pose.position.y, msg->pose.position.z);
             current_position_ = msg->pose.position;
         });
 
@@ -34,7 +33,7 @@ public:
     local_pos_pub_ = this->create_publisher<geometry_msgs::msg::PoseStamped>(
         "mavros/setpoint_position/local", 10);
 
-    // Clientes para armar e setar modo OFFBOARD
+    // Cliente para armar e setar modo OFFBOARD
     arming_client_ = this->create_client<mavros_msgs::srv::CommandBool>("mavros/cmd/arming");
     set_mode_client_ = this->create_client<mavros_msgs::srv::SetMode>("mavros/set_mode");
 
@@ -53,8 +52,12 @@ public:
         std::bind(&InterfaceNode::handle_goal_land, this, std::placeholders::_1, std::placeholders::_2),
         std::bind(&InterfaceNode::handle_cancel_land, this, std::placeholders::_1),
         std::bind(&InterfaceNode::handle_accepted_land, this, std::placeholders::_1));
+
+    // Serviço para mover o drone
+    move_command_service_ = this->create_service<interface_package::srv::MoveCommand>(
+        "move_command", std::bind(&InterfaceNode::handle_move_command, this, std::placeholders::_1, std::placeholders::_2));
     
-    // Timer para enviar continuamente setpoints de posição (necessário para manter OFFBOARD)
+    // Timer para enviar continuamente setpoints de posição
     timer_ = this->create_wall_timer(
         std::chrono::milliseconds(100), std::bind(&InterfaceNode::control_loop, this));
 
@@ -68,7 +71,7 @@ private:
     RCLCPP_INFO(this->get_logger(), "Current mode: %s, Armed: %s", 
                 current_state_.mode.c_str(), current_state_.armed ? "Yes" : "No");
 
-    // Verifique se o drone está conectado
+    // Verificar se o drone está conectado
     if (!current_state_.connected) {
         RCLCPP_ERROR(this->get_logger(), "Drone not connected to MAVROS.");
     }
@@ -142,13 +145,12 @@ private:
     float upper_bound = goal->altitude * 1.1;  // 110% da altitude alvo
 
     while (rclcpp::ok()) {
-        // RCLCPP_INFO(this->get_logger(), "Sending pose update: z = %.2f", pose_.pose.position.z);
         local_pos_pub_->publish(pose_);
 
         feedback->current_altitude = current_position_.z;
         goal_handle->publish_feedback(feedback);
         
-        // Verifique se a altitude atual está dentro da faixa com margem de erro de 10%
+        // Verificar se a altitude atual está dentro da faixa com margem de erro de 10%
         if (current_position_.z >= lower_bound && current_position_.z <= upper_bound) {
             RCLCPP_INFO(this->get_logger(), "Reached target altitude: %.2f (within 10%% margin)", goal->altitude);
             result->success = true;
@@ -181,9 +183,7 @@ private:
   }
 
   // Execute the land action
-// Execute the land action
-void execute_land(const std::shared_ptr<GoalHandleLand> goal_handle) {
-
+  void execute_land(const std::shared_ptr<GoalHandleLand> goal_handle) {
     auto feedback = std::make_shared<Land::Feedback>();
     auto result = std::make_shared<Land::Result>();
 
@@ -220,11 +220,22 @@ void execute_land(const std::shared_ptr<GoalHandleLand> goal_handle) {
         result->success = false;
         goal_handle->abort(result);
     }
-}
+  }
 
-  // Control loop to maintain OFFBOARD mode
+  // Serviço de comando de movimento
+  void handle_move_command(
+      const std::shared_ptr<interface_package::srv::MoveCommand::Request> request,
+      std::shared_ptr<interface_package::srv::MoveCommand::Response> response) {
+    pose_.pose.position.x += request->x;
+    pose_.pose.position.y += request->y;
+    pose_.pose.position.z += request->z;
+
+    RCLCPP_INFO(this->get_logger(), "Received MoveCommand: [x: %.2f, y: %.2f, z: %.2f]",
+                request->x, request->y, request->z);
+    response->success = true;
+  }
+
   void control_loop() {
-    // RCLCPP_INFO(this->get_logger(), "Publishing setpoint: z = %.2f", pose_.pose.position.z);
     local_pos_pub_->publish(pose_);
   }
 
@@ -236,6 +247,7 @@ void execute_land(const std::shared_ptr<GoalHandleLand> goal_handle) {
   rclcpp::Client<mavros_msgs::srv::SetMode>::SharedPtr set_mode_client_;
   rclcpp_action::Server<Takeoff>::SharedPtr takeoff_action_server_;
   rclcpp_action::Server<Land>::SharedPtr land_action_server_;
+  rclcpp::Service<interface_package::srv::MoveCommand>::SharedPtr move_command_service_;
   rclcpp::TimerBase::SharedPtr timer_;
   geometry_msgs::msg::PoseStamped pose_;
   geometry_msgs::msg::Point current_position_; 
