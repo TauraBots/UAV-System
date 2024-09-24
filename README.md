@@ -13,7 +13,7 @@ Certifique-se de ter instalados os seguintes componentes antes de iniciar:
 
 ## Passo a Passo
 
-### 1. Executar o **Micro XRCE-DDS Agent**
+### 1. Executar o **Micro XRCE-DDS Agent  (Para o Simulador)**
 
 ```bash
 MicroXRCEAgent udp4 -p 8888
