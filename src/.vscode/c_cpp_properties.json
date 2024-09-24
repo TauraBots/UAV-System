@@ -1,0 +1,29 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/thxssio/Drone/taura-air-system/install/mavros_extras/include/**",
+        "/home/thxssio/Drone/taura-air-system/install/mavros/include/**",
+        "/home/thxssio/Drone/taura-air-system/install/interface_package/include/**",
+        "/home/thxssio/Drone/taura-air-system/install/mavros_msgs/include/**",
+        "/home/thxssio/Drone/taura-air-system/install/libmavconn/include/**",
+        "/opt/ros/humble/include/**",
+        "/home/thxssio/Drone/taura-air-system/src/mavros/libmavconn/include/**",
+        "/home/thxssio/Drone/taura-air-system/src/mavros/mavros/include/**",
+        "/home/thxssio/Drone/taura-air-system/src/mavros/mavros_extras/include/**",
+        "/home/thxssio/Drone/taura-air-system/src/mavros/mavros_msgs/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

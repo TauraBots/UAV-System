@@ -1,4 +1,3 @@
-<?xml version="1.0"?>
 <package format="3">
   <name>interface_package</name>
   <version>0.0.0</version>
@@ -16,6 +15,7 @@
   <depend>geometry_msgs</depend>
   <depend>mavros_msgs</depend>
   <depend>sensor_msgs</depend>
+  <depend>rclcpp_action</depend>
 
   <member_of_group>rosidl_interface_packages</member_of_group>
 
