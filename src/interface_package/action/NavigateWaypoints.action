@@ -1,10 +1,10 @@
 # Goal
-geometry_msgs/PoseStamped[] waypoints  # Lista de waypoints
+geometry_msgs/PoseStamped[] waypoints  # Lista de waypoints para o drone seguir
 
 ---
 # Result
-bool success  # Indicação se todos os waypoints foram alcançados
+bool success  # Indicação se todos os waypoints foram alcançados com sucesso
 
 ---
 # Feedback
-geometry_msgs/PoseStamped current_pose  # Posição atual enquanto navega
+geometry_msgs/PoseStamped current_pose  # Posição atual enquanto navega pelos waypoints

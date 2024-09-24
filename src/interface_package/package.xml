@@ -1,22 +1,32 @@
 <package format="3">
   <name>interface_package</name>
-  <version>0.0.0</version>
+  <version>0.0.1</version>
   <description>Package that manages drone control and services</description>
   <maintainer email="thxssio@gmail.com">thxssio</maintainer>
   <license>Apache License 2.0</license>
 
-  <!-- Dependências -->
+  <!-- Dependências da Ferramenta de Build -->
   <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- Dependências de Compilação -->
   <build_depend>rosidl_default_generators</build_depend>
+  <build_depend>rclcpp</build_depend>
+  <build_depend>rclcpp_action</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>mavros_msgs</build_depend>
+  <build_depend>builtin_interfaces</build_depend>
+
+  <!-- Dependências de Execução -->
   <exec_depend>rosidl_default_runtime</exec_depend>
+  <exec_depend>rclcpp</exec_depend>
+  <exec_depend>rclcpp_action</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>mavros_msgs</exec_depend>
+  <exec_depend>builtin_interfaces</exec_depend>
 
-  <depend>rclcpp</depend>
-  <depend>std_msgs</depend>
-  <depend>geometry_msgs</depend>
-  <depend>mavros_msgs</depend>
-  <depend>sensor_msgs</depend>
-  <depend>rclcpp_action</depend>
-
+  <!-- Grupo de Pacotes de Interface -->
   <member_of_group>rosidl_interface_packages</member_of_group>
 
   <export>
