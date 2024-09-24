@@ -25,8 +25,8 @@ public:
     current_position_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>(
         "/mavros/local_position/pose", rclcpp::SystemDefaultsQoS(), 
         [this](const geometry_msgs::msg::PoseStamped::SharedPtr msg) {
-            RCLCPP_INFO(this->get_logger(), "Updated position: [x: %.2f, y: %.2f, z: %.2f]", 
-                        msg->pose.position.x, msg->pose.position.y, msg->pose.position.z);
+            // RCLCPP_INFO(this->get_logger(), "Updated position: [x: %.2f, y: %.2f, z: %.2f]", 
+            //             msg->pose.position.x, msg->pose.position.y, msg->pose.position.z);
             current_position_ = msg->pose.position;
         });
 
@@ -67,6 +67,11 @@ private:
     current_state_ = *msg;
     RCLCPP_INFO(this->get_logger(), "Current mode: %s, Armed: %s", 
                 current_state_.mode.c_str(), current_state_.armed ? "Yes" : "No");
+
+    // Verifique se o drone está conectado
+    if (!current_state_.connected) {
+        RCLCPP_ERROR(this->get_logger(), "Drone not connected to MAVROS.");
+    }
   }
 
   // Handle goal for takeoff
@@ -137,15 +142,12 @@ private:
     float upper_bound = goal->altitude * 1.1;  // 110% da altitude alvo
 
     while (rclcpp::ok()) {
-        RCLCPP_INFO(this->get_logger(), "Sending pose update: z = %.2f", pose_.pose.position.z);
+        // RCLCPP_INFO(this->get_logger(), "Sending pose update: z = %.2f", pose_.pose.position.z);
         local_pos_pub_->publish(pose_);
 
         feedback->current_altitude = current_position_.z;
         goal_handle->publish_feedback(feedback);
-
-        RCLCPP_INFO(this->get_logger(), "Current altitude: %.2f, Target altitude: %.2f", 
-                    current_position_.z, goal->altitude);
-
+        
         // Verifique se a altitude atual está dentro da faixa com margem de erro de 10%
         if (current_position_.z >= lower_bound && current_position_.z <= upper_bound) {
             RCLCPP_INFO(this->get_logger(), "Reached target altitude: %.2f (within 10%% margin)", goal->altitude);
@@ -181,6 +183,7 @@ private:
   // Execute the land action
 // Execute the land action
 void execute_land(const std::shared_ptr<GoalHandleLand> goal_handle) {
+
     auto feedback = std::make_shared<Land::Feedback>();
     auto result = std::make_shared<Land::Result>();
 
@@ -221,7 +224,7 @@ void execute_land(const std::shared_ptr<GoalHandleLand> goal_handle) {
 
   // Control loop to maintain OFFBOARD mode
   void control_loop() {
-    RCLCPP_INFO(this->get_logger(), "Publishing setpoint: z = %.2f", pose_.pose.position.z);
+    // RCLCPP_INFO(this->get_logger(), "Publishing setpoint: z = %.2f", pose_.pose.position.z);
     local_pos_pub_->publish(pose_);
   }
 
