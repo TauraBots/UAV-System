@@ -13,14 +13,20 @@ find_package(geometry_msgs REQUIRED)
 find_package(mavros_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(rclcpp_action REQUIRED)
 
-# Gerar interfaces (serviço)
+# Gerar interfaces (serviço e action)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/MoveCommand.srv"
+  "action/NavigateWaypoints.action"
+  "action/Takeoff.action"
+  "action/Land.action"
+  DEPENDENCIES geometry_msgs  # Adicionar a dependência necessária
 )
 
 # Adicionar executável
 add_executable(interface_node src/interface_node.cpp)
+
 
 # Linkar as dependências ao executável
 ament_target_dependencies(interface_node 
@@ -29,15 +35,25 @@ ament_target_dependencies(interface_node
   geometry_msgs 
   mavros_msgs 
   sensor_msgs
+  rclcpp_action
 )
 
 # Certifique-se de que o executável dependa das interfaces geradas
-rosidl_target_interfaces(interface_node
-  ${PROJECT_NAME} "rosidl_typesupport_cpp")
+rosidl_get_typesupport_target(interface_package__rosidl_typesupport_cpp
+  interface_package rosidl_typesupport_cpp)
+
+target_link_libraries(interface_node
+  interface_package__rosidl_typesupport_cpp)
 
 # Instalação
 install(TARGETS
   interface_node
   DESTINATION lib/${PROJECT_NAME})
+
+# Certifique-se de que as interfaces sejam instaladas corretamente
+install(
+  DIRECTORY srv action
+  DESTINATION share/${PROJECT_NAME}
+)
 
 ament_package()

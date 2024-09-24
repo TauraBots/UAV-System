@@ -1,0 +1,10 @@
+# Goal
+geometry_msgs/PoseStamped[] waypoints  # Lista de waypoints
+
+---
+# Result
+bool success  # Indicação se todos os waypoints foram alcançados
+
+---
+# Feedback
+geometry_msgs/PoseStamped current_pose  # Posição atual enquanto navega
