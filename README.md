@@ -15,6 +15,12 @@ Certifique-se de ter instalados os seguintes componentes antes de iniciar:
 
 ## Passo a Passo
 
+
+## Dependencias
+```
+sudo apt install -y python3-vcstool python3-rosinstall-generator python3-osrf-pycommon python3-ament-package
+```
+
 ### 1. Executar o **Micro XRCE-DDS Agent  (Para o Simulador)**
 
 ```bash
