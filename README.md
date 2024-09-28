@@ -17,8 +17,23 @@ Certifique-se de ter instalados os seguintes componentes antes de iniciar:
 
 
 ## Dependencias
-```
+```bash
 sudo apt install -y python3-vcstool python3-rosinstall-generator python3-osrf-pycommon python3-ament-package
+```
+Dentro da workspace, execute:
+
+```bash
+rosinstall_generator --format repos mavlink | tee /tmp/mavlink.repos
+```
+
+```bash
+rosinstall_generator --format repos --upstream mavros | tee -a /tmp/mavros.repos
+```
+```bash
+vcs import src < /tmp/mavlink.repos
+```
+```bash
+vcs import src < /tmp/mavros.repos
 ```
 
 ### 1. Executar o **Micro XRCE-DDS Agent  (Para o Simulador)**
