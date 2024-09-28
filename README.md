@@ -5,11 +5,13 @@ Este projeto utiliza PX4, MAVROS, e ROS 2 para simular e controlar um drone em u
 ## Pré-requisitos
 
 Certifique-se de ter instalados os seguintes componentes antes de iniciar:
+
 - PX4 Autopilot
 - MAVROS
-- ROS 2
-- Gazebo (Simulador)
-- Micro XRCE-DDS
+- [**ROS 2**](https://docs.ros.org/en/humble/Installation.html) (necessário para executar os comandos)
+- [Gazebo](https://docs.px4.io/main/en/sim_gazebo_gz/) (Simulador)
+- [Micro XRCE-DDS](https://micro-xrce-dds.docs.eprosima.com/en/latest/)
+- [QGroundControl](https://qgroundcontrol.com/) (para monitoramento e controle do drone)
 
 ## Passo a Passo
 
