@@ -19,6 +19,7 @@ find_package(rosidl_default_runtime REQUIRED)
 # Gerar interfaces (serviço e action)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/MoveCommand.srv"
+  "srv/SetMission.srv"
   "action/NavigateWaypoints.action"
   "action/Takeoff.action"
   "action/Land.action"
@@ -59,7 +60,7 @@ install(TARGETS
 
 # Instalação dos arquivos de interface (srv e action)
 install(
-  DIRECTORY srv action
+  DIRECTORY srv action launch
   DESTINATION share/${PROJECT_NAME}
 )
 
