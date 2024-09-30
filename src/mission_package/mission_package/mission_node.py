@@ -1,8 +1,18 @@
 import rclpy
 from rclpy.node import Node
 from rclpy.action import ActionClient
+from rclpy.service import Service
+from interface_package.srv import SetMission  # Altere para seu novo serviço
 from interface_package.action import Takeoff, Land, NavigateWaypoints
-from mission_package.missions import Task1
+from mission_package.missions import Task1, Task2, Task3, Task4
+
+# Dicionário para mapear os nomes das missões para as classes correspondentes
+MISSION_MAP = {
+    'task1': Task1,
+    'task2': Task2,
+    'task3': Task3,
+    'task4': Task4,
+}
 
 class MissionNode(Node):
     def __init__(self):
@@ -11,11 +21,29 @@ class MissionNode(Node):
         self.land_action_client = ActionClient(self, Land, 'land')
         self.navigate_action_client = ActionClient(self, NavigateWaypoints, 'navigate_waypoints')
         self.get_logger().info('Mission node is ready.')
-        self.current_mission = Task1(self) 
-        self.current_mission.execute()
+        self.current_mission = None
+        self.srv = self.create_service(SetMission, 'set_mission', self.set_mission_callback)
+
+    def set_mission_callback(self, request, response):
+        mission_name = request.mission_name
+        self.set_mission(mission_name)
+        response.success = True
+        response.message = f"Mission {mission_name} started."
+        return response
+
+    def set_mission(self, mission_name):
+        """Set a new mission based on the mission name."""
+        mission_class = MISSION_MAP.get(mission_name)
+        if mission_class is None:
+            self.get_logger().error(f"Unknown mission: {mission_name}")
+            return
+        
+        self.current_mission = mission_class(self)
+        waypoints = self.current_mission.waypoints()  # Corrigido para usar 'waypoints'
+        self.start_mission(waypoints)
 
     def start_mission(self, waypoints):
-        # Step 1: Decolagem
+        """Start the mission with takeoff."""
         self.get_logger().info("Initiating takeoff...")
         takeoff_goal = Takeoff.Goal()
         takeoff_goal.altitude = 2.0 
@@ -47,7 +75,6 @@ class MissionNode(Node):
             self.get_logger().info("Takeoff failed.")
 
     def navigate_waypoints(self, waypoints):
-        # Enviando goal para NavigateWaypoints
         navigate_goal = NavigateWaypoints.Goal()
         navigate_goal.waypoints = waypoints
 
@@ -103,7 +130,6 @@ class MissionNode(Node):
             self.get_logger().info("Landing succeeded.")
         else:
             self.get_logger().info("Landing failed.")
-
 
 def main(args=None):
     rclpy.init(args=args)
