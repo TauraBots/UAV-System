@@ -113,12 +113,12 @@ make px4_sitl gz_x500
 Este comando lança o MAVROS, que atua como uma ponte entre o PX4 e o ROS 2. O arquivo px4.launch configura todos os nós e parâmetros necessários para MAVROS se comunicar com o PX4, permitindo a troca de comandos de controle e informações de telemetria do drone.
 
 ```bash
-ros2 launch mavros px4.launch
+  ros2 launch mavros px4.launch fcu_url:=/dev/ttyUSB0:921600
 ```
 
 Para ambiete simulado
 ```bash
-ros2 launch mavros px4.launch fcu_url:=udp://:14540@127.0.0.1:14557
+  ros2 launch mavros px4.launch fcu_url:=udp://:14540@127.0.0.1:14557
 ```
 
 
