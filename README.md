@@ -18,7 +18,7 @@ Certifique-se de ter instalados os seguintes componentes antes de iniciar:
 
 ## Dependencias
 ```bash
-sudo apt install -y python3-vcstool python3-rosinstall-generator python3-osrf-pycommon python3-ament-package geographiclib-tools
+sudo apt install -y python3-vcstool python3-rosinstall-generator python3-osrf-pycommon python3-ament-package geographiclib-tools libasio-dev
 ```
 Dentro da workspace, execute:
 
@@ -34,6 +34,10 @@ vcs import src < /tmp/mavlink.repos
 ```
 ```bash
 vcs import src < /tmp/mavros.repos
+```
+
+```bash
+rosdep install --from-paths src --ignore-src -r -y
 ```
 
 ### 1. Executar o **Micro XRCE-DDS Agent  (Para o Simulador)**
