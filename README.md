@@ -18,7 +18,7 @@ Certifique-se de ter instalados os seguintes componentes antes de iniciar:
 
 ## Dependencias
 ```bash
-sudo apt install -y python3-vcstool python3-rosinstall-generator python3-osrf-pycommon python3-ament-package
+sudo apt install -y python3-vcstool python3-rosinstall-generator python3-osrf-pycommon python3-ament-package geographiclib-tools
 ```
 Dentro da workspace, execute:
 
