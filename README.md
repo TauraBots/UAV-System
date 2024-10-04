@@ -116,6 +116,11 @@ Este comando lança o MAVROS, que atua como uma ponte entre o PX4 e o ROS 2. O a
 ros2 launch mavros px4.launch
 ```
 
+Para ambiete simulado
+```bash
+ros2 launch mavros px4.launch fcu_url:=udp://:14540@127.0.0.1:14557
+```
+
 
 
 ### 4. Iniciar o Nó de Interface
