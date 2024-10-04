@@ -49,6 +49,17 @@ Este comando inicia o agente Micro XRCE-DDS na porta 8888 utilizando o protocolo
 
 
 ### 2. Compilar e iniciar a simulação PX4 no Gazebo
+ #### 2.1 Configurando simulador
+ 
+ ```bash
+ git clone https://github.com/PX4/PX4-Autopilot.git --recursive
+ ```
+ Este comando faz o clone deste repositorio. Deve ser executado em uma pasta separada, pois ele será o nosso simulador.
+
+ ```bash
+ bash ./PX4-Autopilot/Tools/setup/ubuntu.sh
+ ```
+ Após isso, Este comando estaremos setando as configuração para o nosso simulador utilizando o ubuntu.
 
 ```bash
 make px4_sitl gz_x500
