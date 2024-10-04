@@ -78,6 +78,8 @@ Efetuaremos o make se caso for a compilação local na pasta
 ```bash
     sudo ldconfig /usr/local/lib/
 ```
+> [!WARNING]  
+> Para ambiente simulado, é necessario ter o [QGroundControl](https://qgroundcontrol.com/) aberto e em execução na maquina.
 
 Inicializando o serviço...
 ```bash
