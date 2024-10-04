@@ -73,7 +73,11 @@ Efetuaremos o make se caso for a compilação local na pasta
  Ou podemos executar o sudo make install para deixar instalado no sistema e sempre ser reconhecido.
 ```bash
     sudo make install
- ```
+```
+
+```bash
+    sudo ldconfig /usr/local/lib/
+```
 
 Inicializando o serviço...
 ```bash
