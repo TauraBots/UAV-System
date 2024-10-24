@@ -5,14 +5,23 @@ FROM dustynv/ros:humble-ros-base-l4t-r32.7.1
 RUN apt-get update && apt-get install -y \
     git \
     build-essential \
-    python3-pip \
-    python3-vcstool \
-    python3-rosinstall-generator \
-    python3-osrf-pycommon \
-    python3-ament-package \
+    python-pip \
+    python-vcstool \
+    python-rosinstall-generator \
+    python-osrf-pycommon \
+    python-ament-package \
     geographiclib-tools \
     libasio-dev \
     && rm -rf /var/lib/apt/lists/*
+
+# Copia o script de instalação do GeographicLib para o container
+COPY install_geographiclib_datasets.sh /root/install_geographiclib_datasets.sh
+
+# Torna o script executável
+RUN chmod +x /root/install_geographiclib_datasets.sh
+
+# Executa o script
+RUN /root/install_geographiclib_datasets.sh
 
 # Configura o ambiente do ROS 2
 SHELL ["/bin/bash", "-c"]
