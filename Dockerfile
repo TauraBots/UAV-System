@@ -1,50 +1,105 @@
-# Usando a imagem base especificada
-FROM dustynv/ros:humble-ros-base-l4t-r32.7.1
+ARG L4T_VERSION=l4t-r35.4.1
+ARG IMAGE_NAME=dustynv/ros:humble-ros-base-${L4T_VERSION}
 
-# Atualiza e instala pacotes necessários
-RUN apt-get update && apt-get install -y \
-    git \
-    build-essential \
-    python-pip \
-    python-vcstool \
-    python-rosinstall-generator \
-    python-osrf-pycommon \
-    python-ament-package \
-    geographiclib-tools \
-    libasio-dev \
-    && rm -rf /var/lib/apt/lists/*
+FROM ${IMAGE_NAME}
 
-# Copia o script de instalação do GeographicLib para o container
-COPY install_geographiclib_datasets.sh /root/install_geographiclib_datasets.sh
+ARG ZED_SDK_MAJOR=4
+ARG ZED_SDK_MINOR=1
+ARG ZED_SDK_PATCH=4
+ARG JETPACK_MAJOR=5
+ARG JETPACK_MINOR=0
+ARG L4T_MAJOR=35
+ARG L4T_MINOR=1
 
-# Torna o script executável
-RUN chmod +x /root/install_geographiclib_datasets.sh
+ARG ROS2_DIST=humble   
 
-# Executa o script
-RUN /root/install_geographiclib_datasets.sh
+# ZED ROS2 Wrapper dependencies version
+ARG XACRO_VERSION=2.0.8
+ARG DIAGNOSTICS_VERSION=3.0.0
+ARG AMENT_LINT_VERSION=0.12.4
+ARG GEOGRAPHIC_INFO_VERSION=1.0.4
+ARG ROBOT_LOCALIZATION_VERSION=3.4.2
 
-# Configura o ambiente do ROS 2
-SHELL ["/bin/bash", "-c"]
-RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+ENV DEBIAN_FRONTEND noninteractive
 
-# Define o diretório de trabalho para onde o Dockerfile está
-WORKDIR /root/UAV-System
+# ZED SDK link
+ENV ZED_SDK_URL="https://stereolabs.sfo2.cdn.digitaloceanspaces.com/zedsdk/${ZED_SDK_MAJOR}.${ZED_SDK_MINOR}/ZED_SDK_Tegra_L4T${L4T_MAJOR}.${L4T_MINOR}_v${ZED_SDK_MAJOR}.${ZED_SDK_MINOR}.${ZED_SDK_PATCH}.zstd.run"
 
-# Gerar o arquivo .repos para MAVLink
-RUN rosinstall_generator --format repos mavlink | tee /tmp/mavlink.repos
+# Check that this SDK exists
+RUN if [ "$(curl -I "${ZED_SDK_URL}" -o /dev/null -s -w '%{http_code}\n' | head -n 1)" = "200" ]; then \
+        echo "The URL points to something."; \
+    else \
+        echo "The URL does not point to a .run file or the file does not exist."; \
+        exit 1; \
+    fi
 
-# Gerar o arquivo .repos para MAVROS
-RUN rosinstall_generator --format repos --upstream mavros | tee -a /tmp/mavros.repos
+# Disable apt-get warnings
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 42D5A192B819C5DA || true && \
+  apt-get update || true && apt-get install -y --no-install-recommends apt-utils dialog && \
+  rm -rf /var/lib/apt/lists/*
 
-# Importa os repositórios para a workspace
-RUN vcs import src < /tmp/mavlink.repos
-RUN vcs import src < /tmp/mavros.repos
+ENV TZ=America/Sao_Paulo
 
-# Instala as dependências
-RUN rosdep update && rosdep install --from-paths src --ignore-src -r -y
 
-# Compila o projeto ROS 2
-RUN colcon build
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \ 
+  apt-get update && \
+  apt-get install --yes lsb-release wget less udev sudo build-essential cmake python3 python3-dev python3-pip python3-wheel git jq libpq-dev zstd usbutils && \    
+  rm -rf /var/lib/apt/lists/*
 
-# Seta o entrypoint para inicializar o ambiente do ROS
-ENTRYPOINT ["bash", "-c", "source /opt/ros/humble/setup.bash && bash"]
+RUN echo "# R${L4T_MAJOR} (release), REVISION: ${L4T_MINOR}" > /etc/nv_tegra_release && \
+  apt-get update -y || true && \
+  apt-get install -y --no-install-recommends zstd wget less cmake curl gnupg2 \
+  build-essential python3 python3-pip python3-dev python3-setuptools libusb-1.0-0-dev -y && \
+  pip install protobuf && \
+  wget -q --no-check-certificate -O ZED_SDK_Linux_JP.run \
+  ${ZED_SDK_URL} && \
+  chmod +x ZED_SDK_Linux_JP.run ; ./ZED_SDK_Linux_JP.run silent skip_tools && \
+  rm -rf /usr/local/zed/resources/* && \
+  rm -rf ZED_SDK_Linux_JP.run && \
+  rm -rf /var/lib/apt/lists/*
+
+# Install the ZED ROS2 Wrapper
+ENV ROS_DISTRO ${ROS2_DIST}
+
+# Copy the sources in the Docker image
+WORKDIR /root/ros2_ws/src
+COPY tmp_sources/ ./
+
+# Install missing dependencies
+WORKDIR /root/ros2_ws/src
+RUN wget https://github.com/ros/xacro/archive/refs/tags/${XACRO_VERSION}.tar.gz -O - | tar -xvz && mv xacro-${XACRO_VERSION} xacro && \
+  wget https://github.com/ros/diagnostics/archive/refs/tags/${DIAGNOSTICS_VERSION}.tar.gz -O - | tar -xvz && mv diagnostics-${DIAGNOSTICS_VERSION} diagnostics && \
+  wget https://github.com/ament/ament_lint/archive/refs/tags/${AMENT_LINT_VERSION}.tar.gz -O - | tar -xvz && mv ament_lint-${AMENT_LINT_VERSION} ament-lint && \
+  wget https://github.com/cra-ros-pkg/robot_localization/archive/refs/tags/${ROBOT_LOCALIZATION_VERSION}.tar.gz -O - | tar -xvz && mv robot_localization-${ROBOT_LOCALIZATION_VERSION} robot-localization && \
+  wget https://github.com/ros-geographic-info/geographic_info/archive/refs/tags/${GEOGRAPHIC_INFO_VERSION}.tar.gz -O - | tar -xvz && mv geographic_info-${GEOGRAPHIC_INFO_VERSION} geographic-info && \
+  cp -r geographic-info/geographic_msgs/ . && \
+  rm -rf geographic-info && \
+  git clone https://github.com/ros-drivers/nmea_msgs.git --branch ros2 && \  
+  git clone https://github.com/ros/angles.git --branch humble-devel
+
+# Check that all the dependencies are satisfied
+WORKDIR /root/ros2_ws
+RUN apt-get update -y || true && rosdep update && \
+  rosdep install --from-paths src --ignore-src -r -y && \
+  rm -rf /var/lib/apt/lists/*
+
+# Install cython
+RUN python3 -m pip install --upgrade cython
+
+# Build the dependencies and the ZED ROS2 Wrapper
+RUN /bin/bash -c "source /opt/ros/$ROS_DISTRO/install/setup.bash && \
+  colcon build --parallel-workers $(nproc) --symlink-install \
+  --event-handlers console_direct+ --base-paths src \
+  --cmake-args ' -DCMAKE_BUILD_TYPE=Release' \
+  ' -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs' \
+  ' -DCMAKE_CXX_FLAGS="-Wl,--allow-shlib-undefined"' \
+  ' --no-warn-unused-cli' "
+
+WORKDIR /root/ros2_ws
+
+# Setup environment variables 
+COPY ros_entrypoint_jetson.sh /sbin/ros_entrypoint.sh
+RUN sudo chmod 755 /sbin/ros_entrypoint.sh
+
+ENTRYPOINT ["/sbin/ros_entrypoint.sh"]
+CMD ["bash"]
