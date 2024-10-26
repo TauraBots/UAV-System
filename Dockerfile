@@ -1,50 +1,67 @@
-# Usando a imagem base especificada
-FROM dustynv/ros:humble-ros-base-l4t-r32.7.1
+# Usando a imagem oficial do ROS 2 Humble
+FROM ros:humble
 
-# Atualiza e instala pacotes necessários
+# Configura o fuso horário e a região
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=America/Sao_Paulo
+
+# Define o diretório de trabalho
+WORKDIR /app
+
+# Instala pacotes essenciais e cria links simbólicos
 RUN apt-get update && apt-get install -y \
-    git \
+    wget \
     build-essential \
-    python-pip \
-    python-vcstool \
-    python-rosinstall-generator \
-    python-osrf-pycommon \
-    python-ament-package \
-    geographiclib-tools \
-    libasio-dev \
-    && rm -rf /var/lib/apt/lists/*
+    cmake \
+    python3 \
+    python3-pip \
+    nano \
+    usbutils \
+    curl \
+    libusb-1.0-0-dev \
+    unzip \
+    python3-dev \
+    zstd \
+    gcc-9 \
+    g++-9 \
+    apt-utils \
+    && ln -sf /usr/bin/python3 /usr/bin/python \
+    && ln -sf /usr/bin/pip3 /usr/bin/pip \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copia o script de instalação do GeographicLib para o container
-COPY install_geographiclib_datasets.sh /root/install_geographiclib_datasets.sh
 
-# Torna o script executável
-RUN chmod +x /root/install_geographiclib_datasets.sh
+# Definindo GCC e G++ como padrões
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 \
+    --slave /usr/bin/g++ g++ /usr/bin/g++-9
 
-# Executa o script
-RUN /root/install_geographiclib_datasets.sh
+# Cria o arquivo nv_tegra_release para emulação
+RUN echo "# R32 (release), REVISION: 7.1, GCID: 28947456, BOARD: t210ref, EABI: aarch64, DATE: Fri Dec 11 03:22:57 UTC 2020" > /etc/nv_tegra_release
 
-# Configura o ambiente do ROS 2
-SHELL ["/bin/bash", "-c"]
-RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+# Cria a variável de ambiente CUDA_VERSION para emulação
+ENV CUDA_VERSION=10.2
+RUN ln -s /usr/local/cuda-10.2 /usr/local/cuda
 
-# Define o diretório de trabalho para onde o Dockerfile está
-WORKDIR /root/UAV-System
+# Instala as dependências do requirements.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Gerar o arquivo .repos para MAVLink
-RUN rosinstall_generator --format repos mavlink | tee /tmp/mavlink.repos
+# Adiciona o ambiente ROS ao bash para o usuário
+RUN echo "source /opt/ros/humble/setup.bash" >> /root/.bashrc \
+    && echo "export PATH=/usr/local/cuda-10.2/bin\${PATH:+:\${PATH}}" >> /root/.bashrc
 
-# Gerar o arquivo .repos para MAVROS
-RUN rosinstall_generator --format repos --upstream mavros | tee -a /tmp/mavros.repos
+# Instala o ZED SDK
+RUN wget -O ZED_SDK_Linux.run "https://download.stereolabs.com/zedsdk/4.2/l4t32.7/jetsons" && \
+    chmod +x ZED_SDK_Linux.run && \
+    ./ZED_SDK_Linux.run silent skip_tools skip_python || true && \
+    rm ZED_SDK_Linux.run
 
-# Importa os repositórios para a workspace
-RUN vcs import src < /tmp/mavlink.repos
-RUN vcs import src < /tmp/mavros.repos
+# Configurar variáveis de ambiente do ZED SDK
+ENV PATH="/usr/local/zed/bin:${PATH}"
+ENV LD_LIBRARY_PATH="/usr/local/zed/lib:/usr/local/cuda-10.2/lib64:${LD_LIBRARY_PATH}"
 
-# Instala as dependências
-RUN rosdep update && rosdep install --from-paths src --ignore-src -r -y
+# Copia o script de entrypoint
+COPY entrypoint.sh /ros_entrypoint.sh
+RUN chmod +x /ros_entrypoint.sh
 
-# Compila o projeto ROS 2
-RUN colcon build
-
-# Seta o entrypoint para inicializar o ambiente do ROS
-ENTRYPOINT ["bash", "-c", "source /opt/ros/humble/setup.bash && bash"]
+# Comando padrão ao iniciar o contêiner
+ENTRYPOINT ["/ros_entrypoint.sh"]
