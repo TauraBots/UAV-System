@@ -1,0 +1,15 @@
+version: "3.3"
+
+services:
+  uav-system:
+    build: .
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - LD_LIBRARY_PATH=/usr/local/zed/lib:/usr/local/cuda-10.2/lib64:$LD_LIBRARY_PATH
+      - PATH=/usr/local/cuda-10.2/bin:/usr/local/zed/bin:$PATH
+    devices:
+      - /dev/bus/usb:/dev/bus/usb
+    volumes:
+      - /usr/local/cuda-10.2:/usr/local/cuda-10.2
+    privileged: true
+    command: bash

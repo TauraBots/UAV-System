@@ -10,12 +10,12 @@ WORKDIR = /root/UAV-System
 # Comando para construir a imagem Docker
 build:
 	@echo "Building Docker image..."
-	docker build -t $(IMAGE_NAME) .
+	docker-compose build
 
 # Comando para rodar o container com privilégios e acesso às portas USB
 run:
 	@echo "Running Docker container with USB access..."
-	docker run -it --privileged --runtime nvidia -v /dev/bus/usb:/dev/bus/usb --network=host --name $(CONTAINER_NAME) $(IMAGE_NAME)
+	docker-compose up
 
 # Comando para entrar no container se ele estiver rodando
 shell:
