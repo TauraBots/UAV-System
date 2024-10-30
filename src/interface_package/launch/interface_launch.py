@@ -11,8 +11,8 @@ def generate_launch_description():
             output='screen'
         ),
         Node(
-            package='mission_package',  
-            executable='mission_node', 
+            package='mission_package',
+            executable='mission_node',
             name='mission_node',
             output='screen'
         )

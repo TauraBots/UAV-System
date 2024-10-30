@@ -13,6 +13,7 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(mavros_msgs REQUIRED)
 find_package(builtin_interfaces REQUIRED)
+find_package(nav_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(rosidl_default_runtime REQUIRED)
 
@@ -46,6 +47,7 @@ ament_target_dependencies(interface_node
   geometry_msgs 
   mavros_msgs 
   builtin_interfaces
+  nav_msgs
 )
 
 # Vincular as interfaces geradas ao executável
