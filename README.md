@@ -40,6 +40,10 @@ vcs import src < /tmp/mavros.repos
 rosdep install --from-paths src --ignore-src -r -y
 ```
 
+```bash
+git clone -b foxy-humble-v3.8.2 src/https://github.com/stereolabs/zed-ros2-wrapper.git
+```
+
 ### 1. Executar o **Micro XRCE-DDS Agent  (Para o Simulador)**
 
 #### 1.1 Instruções de Instalação do Micro XRCE-DDS Agent, onde será executado somente para fim de simulação.
