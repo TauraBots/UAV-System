@@ -31,13 +31,12 @@ Certifique-se de ter instalados os seguintes componentes antes de iniciar:
   - Você pode usar as opções --no-nuttxe --no-sim-toolspara omitir o NuttX e/ou as ferramentas de simulação.
   
 * Reinicie o computador após a conclusão.
+> [!NOTE]
+> Apartir daqui é Necessario que o ROS2 e o gazebo estejam instalado no SO.
   - Podemos testar o simulador entrando da pasta
     ```bash
     cd PX4-Autopilot
     ```
-    > [!NOTE]
-    > É Necessario que o ROS2 e o gazebo estejam instalado no SO.
-    
     E podemos fazer um teste simples com o seguinte comando:
     ```bash
     make px4_sitl gz_x500
